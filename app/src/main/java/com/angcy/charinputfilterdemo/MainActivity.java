@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         inputFilter = new CharInputFilter();
         filters[0] = inputFilter;
 
-        inputFilter.setFilterModel(CharInputFilter.MODEL_NUMBER | CharInputFilter.MODEL_CHINESE);
+        inputFilter.setFilterModel(CharInputFilter.MODEL_ASCII_CHAR);
         inputFilter.setMaxInputLength(10);
         editText3.setFilters(filters);
     }

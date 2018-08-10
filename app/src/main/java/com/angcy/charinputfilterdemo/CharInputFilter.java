@@ -22,6 +22,9 @@ public class CharInputFilter implements InputFilter {
     //允许输入数字
     public static final int MODEL_NUMBER = 4;
 
+    //允许输入Ascii码表的[33-126]的字符
+    public static final int MODEL_ASCII_CHAR = 8;
+
     //限制输入的最大字符数, 小于0不限制
     private int maxInputLength = -1;
 
@@ -73,6 +76,10 @@ public class CharInputFilter implements InputFilter {
         return ('0' <= c && c <= '9');
     }
 
+    public static boolean isAsciiChar(char c) {
+        return (33 <= c && c <= 126);
+    }
+
     @Override
     public CharSequence filter(CharSequence source, int start, int end,
                                Spanned dest, int dstart, int dend) {
@@ -99,6 +106,9 @@ public class CharInputFilter implements InputFilter {
             }
             if ((filterModel & MODEL_NUMBER) == MODEL_NUMBER) {
                 append = isNumber(c) || append;
+            }
+            if ((filterModel & MODEL_ASCII_CHAR) == MODEL_ASCII_CHAR) {
+                append = isAsciiChar(c) || append;
             }
 
             if (append) {
