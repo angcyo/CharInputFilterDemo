@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         filters[0] = inputFilter;
 
         inputFilter.setFilterModel(CharInputFilter.MODEL_ASCII_CHAR);
-        inputFilter.setMaxInputLength(10);
+        inputFilter.setMaxInputLength(100);
         editText3.setFilters(filters);
     }
 }
