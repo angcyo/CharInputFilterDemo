@@ -80,9 +80,18 @@ public class CharInputFilter implements InputFilter {
         return (33 <= c && c <= 126);
     }
 
+    /**
+     * 将 dest 字符串中[dstart, dend] 位置对应的字符串, 替换成 source 字符串中 [start, end] 位置对应的字符串.
+     *
+     * */
     @Override
-    public CharSequence filter(CharSequence source, int start, int end,
-                               Spanned dest, int dstart, int dend) {
+    public CharSequence filter(CharSequence source, //本次需要更新的字符串, (可以理解为输入法输入的字符,比如:我是文本)
+                               int start, //取 source 字符串的开始位置,通常是0
+                               int end,//取 source 字符串的结束位置,通常是source.length()
+                               Spanned dest, //原始字符串
+                               int dstart, //原始字符串开始的位置,
+                               int dend //原始字符串结束的位置, 这种情况会在你已经选中了很多个字符, 然后用输入法输入字符的情况下.
+    ) {
         //此次操作后, 原来的字符数量
         int length = dest.length() - (dend - dstart);
         if (maxInputLength > 0) {
@@ -125,6 +134,6 @@ public class CharInputFilter implements InputFilter {
             }
         }
 
-        return modification;
+        return modification;//返回修改后, 允许输入的字符串. 返回null, 由系统处理.
     }
 }
