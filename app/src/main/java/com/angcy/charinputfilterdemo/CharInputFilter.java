@@ -4,6 +4,9 @@ import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by angcyo on 2018-08-10.
  * Email:angcyo@126.com
@@ -25,15 +28,24 @@ public class CharInputFilter implements InputFilter {
     //允许输入Ascii码表的[33-126]的字符
     public static final int MODEL_ASCII_CHAR = 8;
 
+    //callback过滤模式
+    public static final int MODEL_CALLBACK = 16;
+
     //限制输入的最大字符数, 小于0不限制
     private int maxInputLength = -1;
 
+    List<OnFilterCallback> callbacks;
 
     public CharInputFilter() {
     }
 
     public CharInputFilter(int filterModel) {
         this.filterModel = filterModel;
+    }
+
+    public CharInputFilter(int filterModel, int maxInputLength) {
+        this.filterModel = filterModel;
+        this.maxInputLength = maxInputLength;
     }
 
     public void setFilterModel(int filterModel) {
@@ -82,8 +94,7 @@ public class CharInputFilter implements InputFilter {
 
     /**
      * 将 dest 字符串中[dstart, dend] 位置对应的字符串, 替换成 source 字符串中 [start, end] 位置对应的字符串.
-     *
-     * */
+     */
     @Override
     public CharSequence filter(CharSequence source, //本次需要更新的字符串, (可以理解为输入法输入的字符,比如:我是文本)
                                int start, //取 source 字符串的开始位置,通常是0
@@ -120,6 +131,12 @@ public class CharInputFilter implements InputFilter {
                 append = isAsciiChar(c) || append;
             }
 
+            if (callbacks != null && (filterModel & MODEL_CALLBACK) == MODEL_CALLBACK) {
+                for (OnFilterCallback callback : callbacks) {
+                    append = callback.onFilterAllow(source, c, i, dest, dstart, dend) || append;
+                }
+            }
+
             if (append) {
                 modification.append(c);
             }
@@ -135,5 +152,27 @@ public class CharInputFilter implements InputFilter {
         }
 
         return modification;//返回修改后, 允许输入的字符串. 返回null, 由系统处理.
+    }
+
+    public void addFilterCallback(OnFilterCallback callback) {
+        filterModel |= MODEL_CALLBACK;
+        if (callbacks == null) {
+            callbacks = new ArrayList<>();
+        }
+        if (!callbacks.contains(callback)) {
+            callbacks.add(callback);
+        }
+    }
+
+    public interface OnFilterCallback {
+        /**
+         * 是否允许输入字符c
+         */
+        boolean onFilterAllow(CharSequence source,
+                              char c,
+                              int cIndex,
+                              Spanned dest,
+                              int dstart,
+                              int dend);
     }
 }
